@@ -1,0 +1,15 @@
+Makefile
+Makefile.old
+MYMETA.*
+blib/
+pm_to_blib
+Kafka.xs
+Kafka.c
+Kafka.o
+Kafka.bs
+*.so
+*.dylib
+*.tar.gz
+MANIFEST.bak
+_Inline/
+.claude/

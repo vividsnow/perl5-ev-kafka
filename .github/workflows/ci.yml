@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        perl: ['5.40', '5.38', '5.36', '5.34', '5.32', '5.28', '5.24', '5.20']
+    name: Linux / Perl ${{ matrix.perl }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: ${{ matrix.perl }}
+      - name: Install deps
+        run: cpanm -n EV
+      - name: Build
+        run: perl Makefile.PL && make
+      - name: Test (broker-free)
+        run: make test
+      - name: Start Redpanda
+        run: |
+          docker run --rm -d --name redpanda -p 19092:19092 \
+            redpandadata/redpanda:v24.3.7 \
+            redpanda start --smp 1 --memory 256M --overprovisioned \
+            --kafka-addr 0.0.0.0:19092 --advertise-kafka-addr 127.0.0.1:19092
+          sleep 8
+      - name: Test (integration)
+        run: TEST_KAFKA_BROKER=127.0.0.1:19092 make test
+        continue-on-error: true
+      - name: Stop Redpanda
+        if: always()
+        run: docker rm -f redpanda || true
+
+  macos:
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        perl: ['5.40', '5.36']
+    name: macOS / Perl ${{ matrix.perl }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: ${{ matrix.perl }}
+      - name: Install deps
+        run: cpanm -n EV
+      - name: Build
+        run: perl Makefile.PL && make
+      - name: Test (broker-free)
+        run: make test
+
+  freebsd:
+    runs-on: ubuntu-latest
+    name: FreeBSD / Perl (system)
+    steps:
+      - uses: actions/checkout@v4
+      - uses: vmactions/freebsd-vm@v1
+        with:
+          usesh: true
+          prepare: |
+            pkg install -y perl5 p5-EV gmake openssl lz4
+          run: |
+            perl Makefile.PL && gmake
+            gmake test
