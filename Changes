@@ -1,5 +1,14 @@
 Revision history for EV::Kafka
 
+0.05  2026-07-24
+    - Security hardening: fixed a remote crash in fetch decoding, a SCRAM
+      authentication bypass, and a PBKDF2 CPU DoS
+    - Correctness fixes across the producer, consumer, connection
+      lifecycle, and XS memory management
+    - BREAKING: client objects must now be kept referenced (were immortal),
+      and LZ4 now uses the Kafka frame format (KIP-57), so lz4 data written
+      by 0.04 and earlier is unreadable
+
 0.04  2026-06-02
     - Fix use-after-free when a callback frees the connection
     - Fix use-after-free when a callback clears its own handler
