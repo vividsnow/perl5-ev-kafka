@@ -1946,7 +1946,10 @@ static void kf_encode_record_batch_multi(pTHX_ kf_buf_t *out,
     } else
 #endif
     {
-        (void)compression;
+        /* Requested codec not built in (or COMPRESS_NONE): emit uncompressed
+         * and clear the compression bits so the batch is not mislabeled. */
+        if (compression != COMPRESS_NONE)
+            inner.data[1] &= (char)~0x07;
         kf_buf_append_i32(&inner, (int32_t)count);
         kf_buf_append(&inner, records.data, records.len);
     }
