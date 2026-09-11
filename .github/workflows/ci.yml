@@ -15,7 +15,7 @@ jobs:
         perl: ['5.40', '5.38', '5.36', '5.34', '5.32', '5.28', '5.24', '5.20']
     name: Linux / Perl ${{ matrix.perl }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: shogo82148/actions-setup-perl@v1
         with:
           perl-version: ${{ matrix.perl }}
@@ -55,7 +55,7 @@ jobs:
         perl: ['5.40', '5.36']
     name: macOS / Perl ${{ matrix.perl }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: shogo82148/actions-setup-perl@v1
         with:
           perl-version: ${{ matrix.perl }}
@@ -70,7 +70,7 @@ jobs:
     runs-on: ubuntu-latest
     name: FreeBSD / Perl (system)
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: vmactions/freebsd-vm@v1
         with:
           usesh: true
