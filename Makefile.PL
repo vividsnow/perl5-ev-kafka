@@ -124,6 +124,7 @@ WriteMakefile(
     PREREQ_PM => {
         'EV'       => '4.11',
         'XSLoader' => '0.02',
+        'JSON::PP' => '0',    # cookbook recipe + eg/json_events.pl (core since 5.14 only)
     },
     TEST_REQUIRES => {
         'Test::More' => '0.98',
@@ -145,6 +146,11 @@ WriteMakefile(
         },
         no_index => {
             directory => [qw(t xt src eg bench)],
+        },
+        provides => {
+            'EV::Kafka'         => { file => 'lib/EV/Kafka.pm' },
+            'EV::Kafka::Client' => { file => 'lib/EV/Kafka.pm' },
+            'EV::Kafka::Conn'   => { file => 'lib/EV/Kafka.pm' },
         },
     },
 );
