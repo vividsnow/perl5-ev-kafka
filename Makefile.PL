@@ -15,6 +15,8 @@ unless (-f 'src/ppport.h') {
 copy('src/EV__Kafka.xs', 'Kafka.xs')
     or die "Cannot copy src/EV__Kafka.xs -> Kafka.xs: $!\n";
 
+my $version = MM->parse_version('lib/EV/Kafka.pm');
+
 my %ev = EV::MakeMaker::ev_args();
 
 my @libs;
@@ -147,10 +149,12 @@ WriteMakefile(
         no_index => {
             directory => [qw(t xt src eg bench)],
         },
+        # An explicit provides overrides PAUSE's own scan, so every entry needs a
+        # version: without one PAUSE reads undef, which cannot supersede the
+        # indexed release, and the upload is accepted but never indexed.
         provides => {
-            'EV::Kafka'         => { file => 'lib/EV/Kafka.pm' },
-            'EV::Kafka::Client' => { file => 'lib/EV/Kafka.pm' },
-            'EV::Kafka::Conn'   => { file => 'lib/EV/Kafka.pm' },
+            map { $_ => { file => 'lib/EV/Kafka.pm', version => $version } }
+                qw(EV::Kafka EV::Kafka::Client EV::Kafka::Conn),
         },
     },
 );
